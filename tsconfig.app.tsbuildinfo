@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/entrypoints/configscreen.tsx","./src/entrypoints/fieldconfigscreen.tsx","./src/entrypoints/slugfieldeditor.tsx","./src/hooks/usequeryconfig.ts","./src/utils/buildgraphqlquery.ts","./src/utils/interpolate.ts","./src/utils/parseglobalconfig.ts","./src/utils/render.tsx","./src/utils/slugify.ts"],"version":"5.9.3"}
