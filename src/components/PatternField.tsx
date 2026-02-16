@@ -4,7 +4,7 @@ import { useId } from "react";
 import { TOKEN_RE } from "../utils/interpolate";
 import s from "./PatternField.module.css";
 
-const SPLIT_RE = new RegExp(`(${TOKEN_RE.source})`, "g");
+const SPLIT_RE = new RegExp(`(${TOKEN_RE.source.replace("(\\w+)", "(?:\\w+)")})`, "g");
 
 type Props = {
 	label: string;

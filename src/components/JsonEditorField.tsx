@@ -10,6 +10,7 @@ type Props = {
 	info?: ReactNode;
 	value: string;
 	onChange: (value: string) => void;
+	onBlur?: () => void;
 	placeholder?: string;
 	error?: string;
 };
@@ -33,6 +34,7 @@ export default function JsonEditorField({
 	info,
 	value,
 	onChange,
+	onBlur: externalBlur,
 	placeholder,
 	error: externalError,
 }: Props) {
@@ -49,6 +51,7 @@ export default function JsonEditorField({
 
 	const handleBlur = () => {
 		setJsonError(validateJson(value));
+		externalBlur?.();
 	};
 
 	const fieldLabel = info ? (
