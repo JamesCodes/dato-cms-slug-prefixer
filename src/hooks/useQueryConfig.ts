@@ -12,8 +12,7 @@ export function useQueryConfig(
 		if (!trimmed) return {};
 		try {
 			const parsed = JSON.parse(trimmed);
-			if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
-				return {};
+			if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return {};
 			const result: Record<string, string> = {};
 			for (const [key, value] of Object.entries(parsed)) {
 				if (typeof value === "string") result[key] = value;
@@ -27,10 +26,7 @@ export function useQueryConfig(
 	const [values, setValues] = useState<Record<string, string>>({});
 	const [error, setError] = useState<string | null>(null);
 
-	const queryDef = useMemo(
-		() => buildGraphQLQuery(queryPaths),
-		[queryPaths],
-	);
+	const queryDef = useMemo(() => buildGraphQLQuery(queryPaths), [queryPaths]);
 
 	useEffect(() => {
 		if (!queryDef) {
@@ -53,13 +49,16 @@ export function useQueryConfig(
 			},
 			body: JSON.stringify({ query: queryDef.query }),
 		})
-			.then((r) => r.json())
+			.then((r) => {
+				if (!r.ok) {
+					throw new Error(r.status === 401 ? "Invalid API token." : `API returned ${r.status}.`);
+				}
+				return r.json();
+			})
 			.then((json) => {
 				if (cancelled) return;
 				if (json.errors) {
-					const messages = json.errors.map(
-						(e: { message: string }) => e.message,
-					);
+					const messages = json.errors.map((e: { message: string }) => e.message);
 					setError(messages.join("; "));
 				}
 				if (json.data) {

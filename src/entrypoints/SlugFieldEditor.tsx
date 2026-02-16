@@ -1,6 +1,6 @@
 import type { RenderFieldExtensionCtx } from "datocms-plugin-sdk";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Canvas, TextInput } from "datocms-react-ui";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryConfig } from "../hooks/useQueryConfig";
 import { interpolate } from "../utils/interpolate";
 import { parseGlobalConfig } from "../utils/parseGlobalConfig";
@@ -26,39 +26,28 @@ function getFieldValue(
 }
 
 export default function SlugFieldEditor({ ctx }: Props) {
-	const slugValue =
-		(ctx.formValues[ctx.fieldPath] as string | null | undefined) ?? "";
+	const slugValue = (ctx.formValues[ctx.fieldPath] as string | null | undefined) ?? "";
 
 	// Resolve prefix (display-only — not stored in the field value)
-	const prefixPattern =
-		(ctx.parameters.prefixPattern as string | undefined) ?? "";
-	const queryConfigJson =
-		(ctx.parameters.queryConfig as string | undefined) ?? "";
-	const pluginParams = ctx.plugin.attributes.parameters as Record<
-		string,
-		unknown
-	>;
+	const prefixPattern = (ctx.parameters.prefixPattern as string | undefined) ?? "";
+	const queryConfigJson = (ctx.parameters.queryConfig as string | undefined) ?? "";
+	const pluginParams = ctx.plugin.attributes.parameters as Record<string, unknown>;
 	const apiKey = (pluginParams.apiKey as string | undefined) ?? "";
-	const globalConfig = useMemo(
-		() => parseGlobalConfig(pluginParams),
-		[pluginParams],
-	);
-	const { values: queriedValues } = useQueryConfig(queryConfigJson, apiKey);
+	const globalConfigRaw = (pluginParams.globalConfig as string | undefined) ?? "";
+	const globalConfig = useMemo(() => parseGlobalConfig(globalConfigRaw), [globalConfigRaw]);
+	const { values: queriedValues, error: queryError } = useQueryConfig(queryConfigJson, apiKey);
 	const allValues = useMemo(
 		() => ({ ...globalConfig, ...queriedValues }),
 		[globalConfig, queriedValues],
 	);
-	const resolvedPrefix = prefixPattern
-		? interpolate(prefixPattern, allValues)
-		: "";
+	const resolvedPrefix = prefixPattern ? interpolate(prefixPattern, allValues) : "";
 
 	// Resolve the title field linked via slug_title_field validator
-	const titleFieldId = (
-		ctx.field.attributes.validators as Record<string, unknown>
-	).slug_title_field
+	const titleFieldId = (ctx.field.attributes.validators as Record<string, unknown>).slug_title_field
 		? (
-				(ctx.field.attributes.validators as Record<string, unknown>)
-					.slug_title_field as { title_field_id: string }
+				(ctx.field.attributes.validators as Record<string, unknown>).slug_title_field as {
+					title_field_id: string;
+				}
 			).title_field_id
 		: null;
 
@@ -110,17 +99,24 @@ export default function SlugFieldEditor({ ctx }: Props) {
 	};
 
 	const showRegenerate =
-		titleField &&
-		hasBeenGenerated.current &&
-		titleValue &&
-		slugify(titleValue) !== slugValue;
+		titleField && hasBeenGenerated.current && titleValue && slugify(titleValue) !== slugValue;
 
 	return (
 		<Canvas ctx={ctx}>
+			{queryError && (
+				<p className={s.queryError}>
+					Prefix query failed: {queryError}{" "}
+					<button
+						type="button"
+						className={s.settingsLink}
+						onClick={() => ctx.navigateTo(`/admin/plugins/${ctx.plugin.id}/edit`)}
+					>
+						Open plugin settings
+					</button>
+				</p>
+			)}
 			<div className={s.slugEditor}>
-				{resolvedPrefix && (
-					<span className={s.prefixLabel}>{resolvedPrefix}</span>
-				)}
+				{resolvedPrefix && <span className={s.prefixLabel}>{resolvedPrefix}</span>}
 				<TextInput
 					value={localValue}
 					onChange={(value) => setLocalValue(value)}
@@ -129,12 +125,7 @@ export default function SlugFieldEditor({ ctx }: Props) {
 					disabled={ctx.disabled}
 				/>
 				{showRegenerate && (
-					<Button
-						type="button"
-						buttonType="muted"
-						buttonSize="xs"
-						onClick={handleRegenerate}
-					>
+					<Button type="button" buttonType="muted" buttonSize="xs" onClick={handleRegenerate}>
 						Regenerate
 					</Button>
 				)}

@@ -1,5 +1,6 @@
 import { connect } from "datocms-plugin-sdk";
 import "datocms-react-ui/styles.css";
+import "./code-editor-overrides.css";
 import ConfigScreen from "./entrypoints/ConfigScreen";
 import FieldConfigScreen from "./entrypoints/FieldConfigScreen";
 import SlugFieldEditor from "./entrypoints/SlugFieldEditor";
@@ -20,19 +21,13 @@ connect({
 	renderConfigScreen(ctx) {
 		return render(<ConfigScreen ctx={ctx} />);
 	},
-	renderManualFieldExtensionConfigScreen(
-		fieldExtensionId,
-		ctx,
-	) {
+	renderManualFieldExtensionConfigScreen(fieldExtensionId, ctx) {
 		switch (fieldExtensionId) {
 			case "slugPrefixer":
 				return render(<FieldConfigScreen ctx={ctx} />);
 		}
 	},
-	validateManualFieldExtensionParameters(
-		fieldExtensionId,
-		parameters,
-	) {
+	validateManualFieldExtensionParameters(fieldExtensionId, parameters) {
 		const errors: Record<string, string> = {};
 		if (fieldExtensionId === "slugPrefixer") {
 			const pattern = (parameters.prefixPattern as string) ?? "";
@@ -46,11 +41,7 @@ connect({
 			if (queryConfig.trim()) {
 				try {
 					const parsed = JSON.parse(queryConfig);
-					if (
-						typeof parsed !== "object" ||
-						parsed === null ||
-						Array.isArray(parsed)
-					) {
+					if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
 						errors.queryConfig = "Must be a JSON object.";
 					} else {
 						for (const value of Object.values(parsed)) {

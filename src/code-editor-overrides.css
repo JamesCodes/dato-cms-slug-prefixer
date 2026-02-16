@@ -1,0 +1,9 @@
+/* Override: library maps .token.property and .token.string to the same color */
+.w-tc-editor code.language-json .token.property,
+.w-tc-editor pre.language-json .token.property {
+	color: var(--color-prettylights-syntax-entity) !important;
+}
+.w-tc-editor code.language-json .token.string,
+.w-tc-editor pre.language-json .token.string {
+	color: var(--color-prettylights-syntax-entity-tag) !important;
+}
