@@ -18,6 +18,7 @@ export default function FieldConfigScreen({ ctx }: Props) {
 
 	const [localPattern, setLocalPattern] = useState(prefixPattern);
 	const [localQueryConfig, setLocalQueryConfig] = useState(queryConfig);
+	const [committedQueryConfig, setCommittedQueryConfig] = useState(queryConfig);
 	const [sectionOpen, setSectionOpen] = useState(false);
 
 	const pluginParams = ctx.plugin.attributes.parameters as Record<string, unknown>;
@@ -26,7 +27,7 @@ export default function FieldConfigScreen({ ctx }: Props) {
 	const globalConfig = useMemo(() => parseGlobalConfig(globalConfigRaw), [globalConfigRaw]);
 	const globalEntries = Object.entries(globalConfig);
 
-	const { values: queriedValues, error: queryError } = useQueryConfig(localQueryConfig, apiKey);
+	const { values: queriedValues, error: queryError } = useQueryConfig(committedQueryConfig, apiKey);
 	const allValues = useMemo(
 		() => ({ ...globalConfig, ...queriedValues }),
 		[globalConfig, queriedValues],
@@ -46,7 +47,11 @@ export default function FieldConfigScreen({ ctx }: Props) {
 
 	const handleQueryConfigChange = (value: string) => {
 		setLocalQueryConfig(value);
-		setParams(localPattern, value);
+	};
+
+	const handleQueryConfigBlur = () => {
+		setCommittedQueryConfig(localQueryConfig);
+		setParams(localPattern, localQueryConfig);
 	};
 
 	return (
@@ -104,6 +109,7 @@ export default function FieldConfigScreen({ ctx }: Props) {
 					error={queryError ?? undefined}
 					value={localQueryConfig}
 					onChange={handleQueryConfigChange}
+					onBlur={handleQueryConfigBlur}
 					placeholder={'{"BLOG_SLUG": "siteSettingsModel.blogPage.slug"}'}
 				/>
 
