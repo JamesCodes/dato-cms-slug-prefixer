@@ -3,7 +3,7 @@
 	"description": "Display dynamic, query-driven prefixes on slug fields using your DatoCMS content",
 	"homepage": "https://github.com/JamesCodes/dato-cms-slug-prefixer",
 	"private": false,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"license": "MIT",
 	"author": "JamesCodes <contact@jamescodes.co.uk>",
 	"repository": {
